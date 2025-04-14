@@ -16,6 +16,7 @@
 #include <linux/fixp-arith.h>
 #include <linux/hrtimer.h>
 #include <linux/ktime.h>
+#include <linux/version.h>
 
 #include "usbhid/usbhid.h"
 #include "hid-lg.h"
@@ -2475,8 +2476,12 @@ int lg4ff_init(struct hid_device *hid)
 
 	spin_lock_init(&entry->timer_lock);
 
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 15, 0)
 	hrtimer_init(&entry->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	entry->hrtimer.function = lg4ff_timer_hires;
+#else
+	hrtimer_setup(&entry->hrtimer, lg4ff_timer_hires, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+#endif
 
 	hid_info(hid, "Force feedback support for Logitech Gaming Wheels (%s)\n", VERSION);
 
