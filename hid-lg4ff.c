@@ -454,6 +454,10 @@ static int friction_level = 30;
 module_param(friction_level, int, 0);
 MODULE_PARM_DESC(friction_level, "Level of friction force (0-100).");
 
+static bool lg4ff_no_autoswitch = false;
+module_param(lg4ff_no_autoswitch, bool, S_IRUGO);
+MODULE_PARM_DESC(lg4ff_no_autoswitch, "Disable automatic switching of multimode wheels");
+
 static struct lg4ff_device_entry *lg4ff_get_device_entry(struct hid_device *hid)
 {
 	struct lg_drv_data *drv_data;
@@ -2476,7 +2480,7 @@ int lg4ff_init(struct hid_device *hid)
 
 	spin_lock_init(&entry->timer_lock);
 
-#if LINUX_VERSION_CODE <= KERNEL_VERSION(6, 15, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 15, 0)
 	hrtimer_init(&entry->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 	entry->hrtimer.function = lg4ff_timer_hires;
 #else
